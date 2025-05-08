@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>סימולציה - השפעת pH על פעילות אנזימים</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; padding: 20px; }
+    .chart-container { width: 100%; max-width: 600px; margin: auto; }
+    canvas { width: 100%; height: 400px !important; }
+    button { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>סימולציה: השפעת רמת החומציות על קצב פעילות אנזימים</h2>
+  <label for="enzyme">בחר אנזים:</label>
+  <select id="enzyme">
+    <option value="pepsin">פפסין</option>
+    <option value="amylase">עמילאז</option>
+    <option value="lipase">ליפאז</option>
+  </select>
+  <button id="showAll">הצג את כל הגרפים</button>
+
+  <div class="chart-container">
+    <canvas id="activityChart"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('activityChart').getContext('2d');
+
+    const data = {
+      pepsin: [80, 70, 30, 10, 5, 0],
+      amylase: [10, 30, 60, 100, 80, 40],
+      lipase: [0, 10, 40, 60, 90, 60]
+    };
+
+    const colors = {
+      pepsin: 'rgba(255, 99, 132, 1)',
+      amylase: 'rgba(54, 162, 235, 1)',
+      lipase: 'rgba(75, 192, 192, 1)'
+    };
+
+    const pHValues = [2, 4, 6, 7, 8, 10];
+
+    const createDataset = (key) => ({
+      label: key === 'pepsin' ? 'פפסין' : key === 'amylase' ? 'עמילאז' : 'ליפאז',
+      data: data[key],
+      fill: false,
+      borderColor: colors[key],
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: colors[key],
+      pointHoverRadius: 3
+    });
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: pHValues,
+        datasets: [createDataset('pepsin')]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'line'
+            }
+          },
+          title: { display: true, text: 'השפעת ה-pH על פעילות אנזים' }
+        },
+        scales: {
+          x: { title: { display: true, text: 'רמת pH' } },
+          y: { title: { display: true, text: 'קצב פעילות (יחידות לשעה)' }, beginAtZero: true }
+        }
+      }
+    });
+
+    document.getElementById('enzyme').addEventListener('change', (e) => {
+      const selected = e.target.value;
+      chart.data.datasets = [createDataset(selected)];
+      chart.update();
+    });
+
+    document.getElementById('showAll').addEventListener('click', () => {
+      chart.data.datasets = [
+        createDataset('pepsin'),
+        createDataset('amylase'),
+        createDataset('lipase')
+      ];
+      chart.update();
+    });
+  </script>
+</body>
+</html>
